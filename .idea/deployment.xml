@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="christophschirninger@34.91.120.243" remoteFilesAllowedToDisappearOnAutoupload="false" confirmBeforeUploading="false">
+    <option name="confirmBeforeUploading" value="false" />
+    <serverData>
+      <paths name="christophschirninger@34.90.168.242">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/christophschirninger" local="$PROJECT_DIR$" web="/home/christophschirninger" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="christophschirninger@34.91.120.243">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/christophschirninger" local="$PROJECT_DIR$" web="/home/christophschirninger" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>

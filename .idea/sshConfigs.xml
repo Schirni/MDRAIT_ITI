@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig host="34.91.12.173" id="250171c5-2a27-43f7-9cb4-667cd7879ce0" keyPath="$USER_HOME$/.ssh/id_rsa" port="22" nameFormat="DESCRIPTIVE" username="christophschirninger" useOpenSSHConfig="true" />
+      <sshConfig connectionConfig="{&quot;serverAliveInterval&quot;:300}" host="34.91.120.243" id="30fad8f3-5410-44dd-90f8-3343934aa8ef" keyPath="$USER_HOME$/.ssh/id_rsa" port="22" nameFormat="DESCRIPTIVE" username="christophschirninger" useOpenSSHConfig="true" />
+      <sshConfig host="34.147.56.191" id="c0120c8b-dc38-4dc8-b451-f51234e2161e" keyPath="$USER_HOME$/.ssh/id_rsa" port="22" nameFormat="DESCRIPTIVE" username="christophschirninger" useOpenSSHConfig="true" />
+      <sshConfig host="34.90.168.242" id="8505636f-fc66-45fd-ba26-ac8fd6c14fb5" keyPath="$USER_HOME$/.ssh/id_rsa" port="22" nameFormat="DESCRIPTIVE" username="christophschirninger" useOpenSSHConfig="true" />
+    </configs>
+  </component>
+</project>
