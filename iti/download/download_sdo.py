@@ -154,7 +154,7 @@ if __name__ == '__main__':
 
     [os.makedirs(os.path.join(download_dir, str(c)), exist_ok=True) for c in [171, 193, 211, 304, 6173]]
     downloader = SDODownloader(base_path=download_dir, email=args.email)
-    start_date = datetime(2020, 5, 15)
+    start_date = datetime(2023, 1, 10)
     end_date = datetime.now()
     for d in [start_date + i * timedelta(hours=6) for i in
               range((end_date - start_date) // timedelta(hours=6))]:

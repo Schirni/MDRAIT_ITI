@@ -46,7 +46,7 @@ class SOLODownloader:
         if os.path.exists(file_path):
             return file_path
         #
-        search = Fido.search(a.Time(query_date - timedelta(minutes=15), query_date + timedelta(minutes=15)),
+        search = Fido.search(a.Time(query_date - timedelta(minutes=5), query_date + timedelta(minutes=5)),
                              a.Instrument('EUI'), a.soar.Product(wl), a.Level(2))
         assert search.file_num > 0, "No data found for %s (%s)" % (query_date.isoformat(), wl)
         search = sorted(search['soar'], key=lambda x: abs(pd.to_datetime(x['Start time']) - query_date).total_seconds())
@@ -74,7 +74,7 @@ class SOLODownloader:
         if os.path.exists(file_path):
             return file_path
         #
-        search = Fido.search(a.Time(query_date + timedelta(minutes=15), query_date + timedelta(minutes=15)),
+        search = Fido.search(a.Time(query_date - timedelta(minutes=30), query_date + timedelta(minutes=30)),
                              a.Instrument('EUI'), a.soar.Product(wl), a.Level(2))
         assert search.file_num > 0, "No data found for %s (%s)" % (query_date.isoformat(), wl)
         search = sorted(search['soar'], key=lambda x: abs(pd.to_datetime(x['Start Time']) - query_date).total_seconds())
@@ -104,19 +104,29 @@ if __name__ == '__main__':
 
     #[os.makedirs(os.path.join(base_path, str(c)), exist_ok=True) for c in ['hri_174', 'fsi_174', 'fsi_304']]
     download_util = SOLODownloader(base_path=base_path)
-    start_date = datetime(2021, 2, 22, 0, 0)
-    end_date = datetime(2021, 6, 25, 0, 0)
-    num_months = (end_date.year - start_date.year) * 12 + (end_date.month - start_date.month)
-    month_dates = [start_date + i * relativedelta(months=1) for i in range(num_months)]
-    for date in month_dates:
+    start_date = datetime(2023, 3, 7, 0, 0)
+    end_date = datetime.now()
+    #num_months = (end_date.year - start_date.year) * 12 + (end_date.month - start_date.month)
+    #month_dates = [start_date + i * relativedelta(months=1) for i in range(num_months)]
+    # make weeks_dates
+    #num_weeks = (end_date - start_date).days // 7
+    #weeks_dates = [start_date + i * timedelta(days=7) for i in range(num_weeks)]
+    num_days = (end_date - start_date).days
+    days_dates = [start_date + i * timedelta(days=1) for i in range(num_days)]
+    # make hours_dates
+    #num_hours = (end_date - start_date).days * 24
+    #hours_dates = [start_date + i * timedelta(hours=1) for i in range(num_hours)]
+
+    for date in days_dates:
         search = Fido.search(a.Time(date, date + relativedelta(days=1)),
-                             a.Instrument('EUI'), a.soar.Product('eui-fsi174-image'),
+                             a.Instrument('EUI'), a.soar.Product('eui-fsi304-image'),
                              a.Level(2))
         if search.file_num == 0:
             continue
         dates = search['soar']['Start time']
         dates = pd.to_datetime(dates)
-        step = int(np.floor(len(dates) / 60)) if len(dates) > 60 else 1
+        step = int(np.floor(len(dates) / 4)) if len(dates) > 4 else 1
+        #step = 15
 
         for d in dates[::step]:
             download_util.downloadDate(d)
