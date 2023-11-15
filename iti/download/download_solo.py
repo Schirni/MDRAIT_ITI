@@ -46,7 +46,7 @@ class SOLODownloader:
         if os.path.exists(file_path):
             return file_path
         #
-        search = Fido.search(a.Time(query_date - timedelta(minutes=5), query_date + timedelta(minutes=5)),
+        search = Fido.search(a.Time(query_date - timedelta(minutes=10), query_date + timedelta(minutes=10)),
                              a.Instrument('EUI'), a.soar.Product(wl), a.Level(2))
         assert search.file_num > 0, "No data found for %s (%s)" % (query_date.isoformat(), wl)
         search = sorted(search['soar'], key=lambda x: abs(pd.to_datetime(x['Start time']) - query_date).total_seconds())
@@ -111,22 +111,12 @@ if __name__ == '__main__':
     # make weeks_dates
     #num_weeks = (end_date - start_date).days // 7
     #weeks_dates = [start_date + i * timedelta(days=7) for i in range(num_weeks)]
-    num_days = (end_date - start_date).days
-    days_dates = [start_date + i * timedelta(days=1) for i in range(num_days)]
+    #num_days = (end_date - start_date).days
+    #days_dates = [start_date + i * timedelta(days=1) for i in range(num_days)]
     # make hours_dates
     #num_hours = (end_date - start_date).days * 24
     #hours_dates = [start_date + i * timedelta(hours=1) for i in range(num_hours)]
 
-    for date in days_dates:
-        search = Fido.search(a.Time(date, date + relativedelta(days=1)),
-                             a.Instrument('EUI'), a.soar.Product('eui-fsi304-image'),
-                             a.Level(2))
-        if search.file_num == 0:
-            continue
-        dates = search['soar']['Start time']
-        dates = pd.to_datetime(dates)
-        step = int(np.floor(len(dates) / 4)) if len(dates) > 4 else 1
-        #step = 15
-
-        for d in dates[::step]:
-            download_util.downloadDate(d)
+    for d in [start_date + i * timedelta(hours=3) for i in
+              range((end_date - start_date) // timedelta(hours=3))]:
+        download_util.downloadDate(d)

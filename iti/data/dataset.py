@@ -262,6 +262,35 @@ class SDODataset(StackDataset):
         if patch_shape is not None:
             self.addEditor(BrightestPixelPatchEditor(patch_shape))
 
+class SDODataset2(StackDataset):
+
+    def __init__(self, data, patch_shape=None, resolution=2048, ext='.fits', **kwargs):
+        if isinstance(data, list):
+            paths = data
+        else:
+            paths = get_intersecting_files(data, ['171','304'], ext=ext, **kwargs)
+        data_sets = [AIADataset(paths[0], 171, resolution=resolution, **kwargs),
+                     AIADataset(paths[1], 304, resolution=resolution, **kwargs),
+                    ]
+        super().__init__(data_sets, **kwargs)
+        if patch_shape is not None:
+            self.addEditor(BrightestPixelPatchEditor(patch_shape))
+
+class EUIDataset(StackDataset):
+
+    def __init__(self, data, patch_shape=None, resolution=1024, ext='.fits', **kwargs):
+        if isinstance(data, list):
+            paths = data
+        else:
+            paths = get_intersecting_files(data, ['eui-fsi174-image', 'eui-fsi304-image'], ext=ext, **kwargs)
+        data_sets = [FSIDataset(paths[0], 174, resolution=resolution, **kwargs),
+                     FSIDataset(paths[1], 304, resolution=resolution, **kwargs),
+                    ]
+        super().__init__(data_sets, **kwargs)
+        if patch_shape is not None:
+            self.addEditor(BrightestPixelPatchEditor(patch_shape))
+
+
 
 class AIADataset(BaseDataset):
 

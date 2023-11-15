@@ -9,7 +9,7 @@ from lightning.pytorch.loggers import WandbLogger
 from sunpy.visualization.colormaps import cm
 
 from iti.callback import SaveCallback, PlotBAB, PlotABA
-from iti.data.dataset import SDODataset, StorageDataset, FSIDataset, ITIDataModule, AIADataset
+from iti.data.dataset import SDODataset, StorageDataset, FSIDataset, ITIDataModule, AIADataset, SDODataset2, EUIDataset
 from iti.data.editor import RandomPatchEditor, BrightestPixelPatchEditor
 from iti.iti import ITIModule
 
@@ -38,27 +38,29 @@ sdo_converted_path = data_config['converted_B_path']
 test_months = [11, 12]
 train_months = list(range(2, 10))
 
-sdo_dataset = AIADataset(sdo_path, wavelength=304, months=train_months)
+sdo_dataset = SDODataset2(sdo_path, months=train_months)
 sdo_dataset = StorageDataset(sdo_dataset,
                              sdo_converted_path,
                              ext_editors=[RandomPatchEditor((256, 256))])
 
-fsi_dataset = FSIDataset(fsi_path, wavelength=304, months=train_months)
+fsi_dataset = EUIDataset(fsi_path, months=train_months)
 fsi_dataset = StorageDataset(fsi_dataset,
                              fsi_converted_path,
-                             ext_editors=[RandomPatchEditor((256, 256))])
+                             ext_editors=[RandomPatchEditor((128, 128))])
 
-sdo_valid = AIADataset(sdo_path, wavelength=304, months=test_months, sdo_converted_path=sdo_converted_path,
+sdo_valid = StorageDataset(SDODataset2(sdo_path, months=test_months, limit=200), sdo_converted_path,
                        ext_editors=[RandomPatchEditor((256, 256))])
-fsi_valid = FSIDataset(fsi_path, wavelength=304, months=test_months, fsi_converted_path=fsi_converted_path,
-                          ext_editors=[RandomPatchEditor((256, 256))])
+fsi_valid = StorageDataset(EUIDataset(fsi_path, months=test_months, limit=200), fsi_converted_path,
+                          ext_editors=[RandomPatchEditor((128, 128))])
 
 data_module = ITIDataModule(fsi_dataset, sdo_dataset, fsi_valid, sdo_valid, **config['data'])
 
 plot_settings_A = [
+    {"cmap": cm.sdoaia171, "title": "FSI 174", 'vmin': -1, 'vmax': 1},
     {"cmap": cm.sdoaia304, "title": "FSI 304", 'vmin': -1, 'vmax': 1},
 ]
 plot_settings_B = [
+    {"cmap": cm.sdoaia171, "title": "SDO 171", 'vmin': -1, 'vmax': 1},
     {"cmap": cm.sdoaia304, "title": "SDO 304", 'vmin': -1, 'vmax': 1},
 ]
 
