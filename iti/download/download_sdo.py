@@ -16,12 +16,12 @@ from sunpy.util import MetaDict
 
 class SDODownloader:
 
-    def __init__(self, base_path, email, wavelengths=['171', '193', '211', '304'], n_workers=5):
+    def __init__(self, base_path, email, wavelengths=['131', '171', '193', '211', '304', '335'], n_workers=5):
         self.ds_path = base_path
         self.wavelengths = [str(wl) for wl in wavelengths]
         self.n_workers = n_workers
-        [os.makedirs(os.path.join(base_path, wl), exist_ok=True) for wl in self.wavelengths + ['6173']]
-
+        #[os.makedirs(os.path.join(base_path, wl), exist_ok=True) for wl in self.wavelengths + ['6173']]
+        [os.makedirs(os.path.join(base_path, wl), exist_ok=True) for wl in self.wavelengths]
         self.drms_client = drms.Client(email=email, verbose=False)
 
     def download(self, sample):
@@ -57,12 +57,12 @@ class SDODownloader:
         logging.info('Start download: %s' % id)
         # query Magnetogram
         time_param = '%sZ' % date.isoformat('_', timespec='seconds')
-        ds_hmi = 'hmi.M_720s[%s]{magnetogram}' % time_param
-        keys_hmi = self.drms_client.keys(ds_hmi)
-        header_hmi, segment_hmi = self.drms_client.query(ds_hmi, key=','.join(keys_hmi), seg='magnetogram')
-        if len(header_hmi) != 1 or np.any(header_hmi.QUALITY != 0):
-            self.fetchDataFallback(date)
-            return
+        #ds_hmi = 'hmi.M_720s[%s]{magnetogram}' % time_param
+        #keys_hmi = self.drms_client.keys(ds_hmi)
+        #header_hmi, segment_hmi = self.drms_client.query(ds_hmi, key=','.join(keys_hmi), seg='magnetogram')
+        #if len(header_hmi) != 1 or np.any(header_hmi.QUALITY != 0):
+        #    self.fetchDataFallback(date)
+        #    return
 
         # query EUV
         time_param = '%sZ' % date.isoformat('_', timespec='seconds')
@@ -74,8 +74,8 @@ class SDODownloader:
             return
 
         queue = []
-        for (idx, h), s in zip(header_hmi.iterrows(), segment_hmi.magnetogram):
-            queue += [(h.to_dict(), s, date)]
+        #for (idx, h), s in zip(header_hmi.iterrows(), segment_hmi.magnetogram):
+        #    queue += [(h.to_dict(), s, date)]
         for (idx, h), s in zip(header_euv.iterrows(), segment_euv.image):
             queue += [(h.to_dict(), s, date)]
 
@@ -133,7 +133,7 @@ class SDODownloader:
             segment_euv.append(segment_tmp.iloc[0].drop('date_diff'))
 
         queue = []
-        queue += [(header_hmi.to_dict(), segment_hmi.magnetogram, date)]
+        #queue += [(header_hmi.to_dict(), segment_hmi.magnetogram, date)]
         for h, s in zip(header_euv, segment_euv):
             queue += [(h.to_dict(), s.image, date)]
 
@@ -147,15 +147,21 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Download SDO data from JSOC with quality check and fallback')
     parser.add_argument('--download_dir', type=str, help='path to the download directory.')
     parser.add_argument('--email', type=str, help='registered email address for JSOC.')
+    parser.add_argument('--start_date', type=str, help='start date in format YYYY-MM-DD.')
+    parser.add_argument('--end_date', type=str, help='end date in format YYYY-MM-DD.', required=False,
+                        default=str(datetime.now()).split(' ')[0])
 
     args = parser.parse_args()
     download_dir = args.download_dir
+    start_date = args.start_date
+    end_date = args.end_date
     #download_dir = '/Users/christophschirninger/PycharmProjects/MDRAIT_ITI'
 
-    [os.makedirs(os.path.join(download_dir, str(c)), exist_ok=True) for c in [171, 193, 211, 304, 6173]]
+    [os.makedirs(os.path.join(download_dir, str(c)), exist_ok=True) for c in [131, 171, 193, 211, 304, 335]]
     downloader = SDODownloader(base_path=download_dir, email=args.email)
-    start_date = datetime(2023, 6, 5)
-    end_date = datetime.now()
-    for d in [start_date + i * timedelta(hours=6) for i in
-              range((end_date - start_date) // timedelta(hours=6))]:
+    start_date_datetime = datetime.strptime(start_date, "%Y-%m-%d")
+    #end_date = datetime.now()
+    end_date_datetime = datetime.strptime(end_date, "%Y-%m-%d")
+    for d in [start_date_datetime + i * timedelta(days=1) for i in
+              range((end_date_datetime - start_date_datetime) // timedelta(days=1))]:
         downloader.downloadDate(d)
